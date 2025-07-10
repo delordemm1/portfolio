@@ -6,6 +6,7 @@ import * as table from '$lib/server/db/schema';
 import { uploadToR2, validateImageFile } from '$lib/server/r2';
 import { v4 as uuidv4 } from 'uuid';
 import type { Actions, PageServerLoad } from './$types';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async () => {
 	const user = requireLogin();
@@ -76,6 +77,43 @@ export const actions: Actions = {
 		} catch (error) {
 			console.error('Error creating blog post:', error);
 			return fail(500, { message: 'Failed to create blog post' });
+		}
+	},
+
+	generateAiSummary: async (event) => {
+		requireLogin();
+
+		const formData = await event.request.formData();
+		const title = formData.get('title');
+		const manualSummary = formData.get('manualSummary');
+
+		if (!title || typeof title !== 'string' || title.trim().length === 0) {
+			return fail(400, { message: 'Title is required to generate AI summary' });
+		}
+
+		try {
+			// Call our AI summary API endpoint
+			const response = await fetch(`${event.url.origin}/api/generate-ai-summary`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					title: title.trim(),
+					manualSummary: manualSummary && typeof manualSummary === 'string' ? manualSummary.trim() : null
+				})
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				return fail(500, { message: errorData.message || 'Failed to generate AI summary' });
+			}
+
+			const { aiSummary } = await response.json();
+			return { success: true, aiSummary, message: 'AI summary generated successfully' };
+		} catch (error) {
+			console.error('Error generating AI summary:', error);
+			return fail(500, { message: 'Failed to generate AI summary' });
 		}
 	}
 };

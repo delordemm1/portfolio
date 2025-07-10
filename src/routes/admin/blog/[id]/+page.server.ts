@@ -133,6 +133,55 @@ export const actions: Actions = {
       return fail(500, { message: "Failed to update blog post" });
     }
   },
+
+  generateAiSummary: async (event) => {
+    requireLogin();
+
+    const formData = await event.request.formData();
+    const postId = event.params.id;
+    const title = formData.get('title');
+    const manualSummary = formData.get('manualSummary');
+
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return fail(400, { message: 'Title is required to generate AI summary' });
+    }
+
+    try {
+      // Call our AI summary API endpoint
+      const response = await fetch(`${event.url.origin}/api/generate-ai-summary`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          manualSummary: manualSummary && typeof manualSummary === 'string' ? manualSummary.trim() : null
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return fail(500, { message: errorData.message || 'Failed to generate AI summary' });
+      }
+
+      const { aiSummary } = await response.json();
+
+      // Update the blog post with the AI summary
+      await db
+        .update(table.blogPost)
+        .set({
+          aiSummary: aiSummary,
+          updatedAt: new Date(),
+        })
+        .where(eq(table.blogPost.id, postId));
+
+      return { success: true, aiSummary, message: 'AI summary generated and saved successfully' };
+    } catch (error) {
+      console.error('Error generating AI summary:', error);
+      return fail(500, { message: 'Failed to generate AI summary' });
+    }
+  },
+
   addBlock: async (event) => {
     requireLogin();
 
