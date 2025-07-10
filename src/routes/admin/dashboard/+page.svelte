@@ -65,9 +65,12 @@
 							</div>
 						</div>
 						<div class="mt-4">
-							<button class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+							<a
+								href="/admin/projects"
+								class="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors text-center"
+							>
 								Manage Projects
-							</button>
+							</a>
 						</div>
 					</div>
 				</div>
