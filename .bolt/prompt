@@ -1,0 +1,127 @@
+Project Title: Dynamic Personal Portfolio & Advanced Blog Platform
+
+Core Objective: To develop a sleek, modern, and high-performance personal portfolio website using SvelteKit. The application will feature a public-facing site to showcase projects and writings, and a private, secure admin panel for managing all site content, including a sophisticated block-based blog editor.
+
+1. Core Technology Stack
+Use the latest stable versions for all packages. Do not introduce unnecessary dependencies without explicit approval.
+
+Framework: SvelteKit (utilizing Svelte 5 features like Runes).
+
+Database: Turso (distributed SQLite for edge performance).
+
+ORM: Drizzle ORM for type-safe database interactions.
+
+Deployment Target: Cloudflare Pages & Workers.
+
+Authentication: Lucia Auth securing the admin panel with a simple email and password login for a single, pre-seeded admin user.
+
+File Storage: Cloudflare R2 for hosting optimized images, blog assets, and the generated resume PDF.
+
+UI Components: Flowbite-Svelte.
+
+Icons: Flowbite-Svelte-Icons.
+
+Security: Cloudflare Turnstile for CAPTCHA on all public forms.
+
+Additional Tools: A server-side PDF generation library (e.g., pdfkit), an image optimization library for uploads.
+
+2. Design & UX Philosophy
+Aesthetics: The design must be clean, professional, and visually engaging. The blog, in particular, must have a unique and highly creative layout that stands out.
+
+Responsiveness: A mobile-first approach is essential. The portfolio must be perfectly readable and navigable on all devices.
+
+Performance: The site must be exceptionally fast, leveraging SvelteKit's server-side rendering and Cloudflare's edge network.
+
+3. Project Scope & Feature Breakdown
+3.1 Public-Facing Website
+Home Page: An engaging introduction, featuring recent projects or blog posts.
+
+About Page: A detailed personal bio and skills summary.
+
+View/Download Resume Page: A page that dynamically renders resume data from the database into a beautiful, downloadable PDF.
+
+Projects Page: A filterable gallery of published projects, each linking to a detailed case study page.
+
+Blog Page: A list of all blog posts, leading to uniquely styled, single-post pages.
+
+Contact Page: Featuring a "Hire Me" form protected by Cloudflare Turnstile.
+
+Client Feedback Page: A form for clients to submit feedback, also protected by Cloudflare Turnstile.
+
+3.2 Admin Panel (Single Admin User)
+A secure, password-protected back-office. No registration flow; the admin user will be seeded directly into the database.
+
+Dashboard: A simple landing page after login.
+
+Project Management: Full CRUD for portfolio projects with the following fields:
+
+name, image, short description, optional link, full description.
+
+extra details (e.g., text field for stack used, skills used).
+
+Draft/Published status toggle. Draft projects will not appear on the public site.
+
+Blog Management:
+
+Full CRUD for blog posts.
+
+Block-based Editor: Instead of one text field, a post is composed of multiple blocks that can be added, edited, and reordered.
+
+Blog Fields: title, manual summary, and an AI-generated summary (optional).
+
+Block Types:
+
+Text: Using the Flowbite WYSIWYG plugin.
+
+Image: With automatic compression and optimization on upload to R2.
+
+YouTube Video: Embed by pasting a URL.
+
+Link: A styled block for embedding external links.
+
+Resume/CV Management: An interface with fields to input and update all sections of the resume (experience, education, skills, etc.).
+
+Request Management: Views to read submissions from the "Hire Me" and "Client Feedback" forms.
+
+Comment Management: A view to moderate comments submitted on blog posts.
+
+4. Detailed User Stories & Flows
+4.1 Blog Content Flow
+Admin creates a new blog post, providing a title and manual summary. They can click a button to trigger a Cloudflare Worker AI call to generate an alternative summary.
+
+The admin uses the block editor to build the post, adding text blocks, uploading images, and embedding videos in their desired order.
+
+On the public site, the blog page renders these blocks sequentially, each styled according to its type, creating a dynamic and visually rich article.
+
+Visitors can leave comments on a post, which are first validated by Cloudflare Turnstile before being submitted for moderation.
+
+4.2 Resume Generation Flow
+In the admin panel, the admin fills out structured fields for their resume content (e.g., adding a new job under "Experience").
+
+A visitor clicks "Download Resume". This triggers a server-side endpoint in SvelteKit.
+
+The endpoint fetches the resume data from Turso, uses a library like pdfkit to generate a professionally formatted PDF on the fly, and streams it back to the user for download.
+
+4.3 Project Publishing Flow
+Admin creates a new project and saves it as a "Draft". It is only visible within the admin panel.
+
+After finalizing the details, the admin toggles the status to "Published".
+
+The project now automatically appears on the public-facing projects page.
+
+5. Technical & Implementation Guidelines
+SvelteKit Best Practices: Use +page.server.ts for data loading and form actions. All form submissions must be validated server-side.
+
+SuperSEO:
+
+Dynamic Metatags: Dynamically generate <title> and <meta description> tags for each project and blog post page based on its content.
+
+Structured Data: Implement JSON-LD schemas (e.g., Article, Person) to provide rich context for search engines.
+
+Sitemap: Automatically generate a sitemap.xml file that includes all public pages.
+
+Database Schema: The Drizzle schema must support the block-based content structure, likely with a posts table and a related content_blocks table that includes a type and order field.
+
+Security: The seeded admin password must be securely hashed. All form actions must validate the Cloudflare Turnstile token on the server before processing data.
+
+Code Quality: The codebase must be clean, well-commented, and easily maintainable.
