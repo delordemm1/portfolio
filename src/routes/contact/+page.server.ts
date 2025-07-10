@@ -1,4 +1,7 @@
 import { fail } from '@sveltejs/kit';
+import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
@@ -46,9 +49,10 @@ export const actions: Actions = {
 		// }
 
 		try {
-			// TODO: Store the contact form submission in the database
-			// For now, we'll just log it
-			console.log('Contact form submission:', {
+			// Store the contact form submission in the database
+			const submissionId = generateId();
+			await db.insert(table.contactSubmission).values({
+				id: submissionId,
 				name: name.trim(),
 				email: email.trim(),
 				company: company && typeof company === 'string' ? company.trim() : null,
@@ -56,7 +60,6 @@ export const actions: Actions = {
 				message: message.trim(),
 				budget: budget && typeof budget === 'string' ? budget.trim() : null,
 				timeline: timeline && typeof timeline === 'string' ? timeline.trim() : null,
-				submittedAt: new Date().toISOString()
 			});
 
 			return { success: true, message: 'Thank you for your message! I\'ll get back to you soon.' };
@@ -66,3 +69,9 @@ export const actions: Actions = {
 		}
 	}
 };
+
+function generateId() {
+	const bytes = crypto.getRandomValues(new Uint8Array(15));
+	const id = encodeBase32LowerCase(bytes);
+	return id;
+}

@@ -1,4 +1,7 @@
 import { fail } from '@sveltejs/kit';
+import { encodeBase32LowerCase } from '@oslojs/encoding';
+import { db } from '$lib/server/db';
+import * as table from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
@@ -52,9 +55,10 @@ export const actions: Actions = {
 		// }
 
 		try {
-			// TODO: Store the feedback submission in the database
-			// For now, we'll just log it
-			console.log('Client feedback submission:', {
+			// Store the feedback submission in the database
+			const submissionId = generateId();
+			await db.insert(table.feedbackSubmission).values({
+				id: submissionId,
 				clientName: clientName.trim(),
 				email: email.trim(),
 				company: company && typeof company === 'string' ? company.trim() : null,
@@ -62,9 +66,8 @@ export const actions: Actions = {
 				rating: parseInt(rating),
 				feedback: feedback.trim(),
 				improvements: improvements && typeof improvements === 'string' ? improvements.trim() : null,
-				recommend: recommend === 'yes',
-				testimonialPermission: testimonialPermission === 'yes',
-				submittedAt: new Date().toISOString()
+				recommend: recommend && typeof recommend === 'string' ? recommend : null,
+				testimonialPermission: testimonialPermission && typeof testimonialPermission === 'string' ? testimonialPermission : null
 			});
 
 			return { success: true, message: 'Thank you for your valuable feedback! I really appreciate it.' };
@@ -74,3 +77,9 @@ export const actions: Actions = {
 		}
 	}
 };
+
+function generateId() {
+	const bytes = crypto.getRandomValues(new Uint8Array(15));
+	const id = encodeBase32LowerCase(bytes);
+	return id;
+}

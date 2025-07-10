@@ -121,3 +121,32 @@ export type Experience = typeof experience.$inferSelect;
 export type Education = typeof education.$inferSelect;
 export type Skill = typeof skill.$inferSelect;
 export type SocialLink = typeof socialLink.$inferSelect;
+
+export const contactSubmission = sqliteTable('contact_submission', {
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	email: text('email').notNull(),
+	company: text('company'),
+	subject: text('subject').notNull(),
+	message: text('message').notNull(),
+	budget: text('budget'),
+	timeline: text('timeline'),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+});
+
+export const feedbackSubmission = sqliteTable('feedback_submission', {
+	id: text('id').primaryKey(),
+	clientName: text('client_name').notNull(),
+	email: text('email').notNull(),
+	company: text('company'),
+	projectName: text('project_name').notNull(),
+	rating: integer('rating').notNull(),
+	feedback: text('feedback').notNull(),
+	improvements: text('improvements'),
+	recommend: text('recommend'),
+	testimonialPermission: text('testimonial_permission'),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+});
+
+export type ContactSubmission = typeof contactSubmission.$inferSelect;
+export type FeedbackSubmission = typeof feedbackSubmission.$inferSelect;

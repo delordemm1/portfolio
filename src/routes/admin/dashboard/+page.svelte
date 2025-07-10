@@ -146,9 +146,12 @@
 							</div>
 						</div>
 						<div class="mt-4">
-							<button class="w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-								View Messages
-							</button>
+							<a
+								href="/admin/requests"
+								class="block w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors text-center"
+							>
+								View Requests
+							</a>
 						</div>
 					</div>
 				</div>
