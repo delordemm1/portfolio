@@ -4,6 +4,7 @@
 
   let { data, form }: { data: PageServerData; form: ActionData } = $props();
   let isSubmitting = $state(false);
+  let isGeneratingAi = $state(false);
   let removeFeaturedImage = $state(false);
   let editingBlock = $state<string | null>(null);
   let draggedBlock = $state<string | null>(null);
