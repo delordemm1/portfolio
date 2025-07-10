@@ -307,10 +307,10 @@
 							</div>
 						</div>
 
-						<!-- TODO: Add Cloudflare Turnstile here -->
-						<!-- <div class="mt-6">
-							<div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY"></div>
-						</div> -->
+						<!-- Cloudflare Turnstile -->
+						<div class="pt-6">
+							<div class="cf-turnstile" data-sitekey="{import.meta.env.VITE_TURNSTILE_SITE_KEY || 'YOUR_SITE_KEY'}"></div>
+						</div>
 
 						<!-- Submit Button -->
 						<div class="pt-6">

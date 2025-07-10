@@ -2,6 +2,7 @@ import { fail } from '@sveltejs/kit';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
+import { env } from '$env/dynamic/private';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
@@ -48,11 +49,35 @@ export const actions: Actions = {
 			return fail(400, { message: 'Feedback is required' });
 		}
 
-		// TODO: Add Cloudflare Turnstile validation here
-		// const turnstileToken = formData.get('cf-turnstile-response');
-		// if (!turnstileToken) {
-		//   return fail(400, { message: 'Please complete the CAPTCHA' });
-		// }
+		// Cloudflare Turnstile validation
+		const turnstileToken = formData.get('cf-turnstile-response');
+		if (!turnstileToken || typeof turnstileToken !== 'string') {
+			return fail(400, { message: 'Please complete the CAPTCHA verification' });
+		}
+
+		// Verify Turnstile token
+		if (env.TURNSTILE_SECRET_KEY) {
+			try {
+				const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: new URLSearchParams({
+						secret: env.TURNSTILE_SECRET_KEY,
+						response: turnstileToken,
+					}),
+				});
+
+				const turnstileResult = await turnstileResponse.json();
+				if (!turnstileResult.success) {
+					return fail(400, { message: 'CAPTCHA verification failed. Please try again.' });
+				}
+			} catch (error) {
+				console.error('Turnstile verification error:', error);
+				return fail(500, { message: 'CAPTCHA verification failed. Please try again.' });
+			}
+		}
 
 		try {
 			// Store the feedback submission in the database
