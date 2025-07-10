@@ -92,9 +92,12 @@
 							</div>
 						</div>
 						<div class="mt-4">
-							<button class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+							<a
+								href="/admin/blog"
+								class="block w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors text-center"
+							>
 								Manage Blog
-							</button>
+							</a>
 						</div>
 					</div>
 				</div>
