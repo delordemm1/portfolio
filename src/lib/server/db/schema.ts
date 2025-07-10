@@ -56,3 +56,68 @@ export const blogBlock = sqliteTable('blog_block', {
 
 export type BlogPost = typeof blogPost.$inferSelect;
 export type BlogBlock = typeof blogBlock.$inferSelect;
+
+// Resume tables
+export const resume = sqliteTable('resume', {
+	id: text('id').primaryKey(),
+	fullName: text('full_name').notNull(),
+	title: text('title').notNull(),
+	email: text('email').notNull(),
+	phone: text('phone'),
+	location: text('location'),
+	website: text('website'),
+	summary: text('summary'),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+});
+
+export const experience = sqliteTable('experience', {
+	id: text('id').primaryKey(),
+	resumeId: text('resume_id').notNull().references(() => resume.id, { onDelete: 'cascade' }),
+	company: text('company').notNull(),
+	position: text('position').notNull(),
+	startDate: text('start_date').notNull(), // YYYY-MM format
+	endDate: text('end_date'), // YYYY-MM format, null for current
+	description: text('description'),
+	location: text('location'),
+	order: integer('order').notNull().default(0),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+});
+
+export const education = sqliteTable('education', {
+	id: text('id').primaryKey(),
+	resumeId: text('resume_id').notNull().references(() => resume.id, { onDelete: 'cascade' }),
+	institution: text('institution').notNull(),
+	degree: text('degree').notNull(),
+	field: text('field'),
+	startDate: text('start_date').notNull(), // YYYY-MM format
+	endDate: text('end_date'), // YYYY-MM format, null for current
+	gpa: text('gpa'),
+	description: text('description'),
+	order: integer('order').notNull().default(0),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+});
+
+export const skill = sqliteTable('skill', {
+	id: text('id').primaryKey(),
+	resumeId: text('resume_id').notNull().references(() => resume.id, { onDelete: 'cascade' }),
+	name: text('name').notNull(),
+	category: text('category').notNull(), // 'technical', 'soft', 'language', etc.
+	level: text('level'), // 'beginner', 'intermediate', 'advanced', 'expert'
+	order: integer('order').notNull().default(0),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+});
+
+export const socialLink = sqliteTable('social_link', {
+	id: text('id').primaryKey(),
+	resumeId: text('resume_id').notNull().references(() => resume.id, { onDelete: 'cascade' }),
+	platform: text('platform').notNull(), // 'linkedin', 'github', 'twitter', etc.
+	url: text('url').notNull(),
+	order: integer('order').notNull().default(0),
+	createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`)
+});
+
+export type Resume = typeof resume.$inferSelect;
+export type Experience = typeof experience.$inferSelect;
+export type Education = typeof education.$inferSelect;
+export type Skill = typeof skill.$inferSelect;
+export type SocialLink = typeof socialLink.$inferSelect;
