@@ -96,7 +96,7 @@
 								</div>
 								<div>
 									<h3 class="font-semibold text-gray-900">Email</h3>
-									<p class="text-gray-600">hello@example.com</p>
+									<p class="text-gray-600">devemm01@gmail.com</p>
 								</div>
 							</div>
 
@@ -230,7 +230,8 @@
 										class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
 									>
 										<option value="">Select budget range</option>
-										<option value="under-5k">Under $5,000</option>
+										<option value="under-1k">Under $1,000</option>
+										<option value="1k-5k">$1,000 - $5,000</option>
 										<option value="5k-10k">$5,000 - $10,000</option>
 										<option value="10k-25k">$10,000 - $25,000</option>
 										<option value="25k-50k">$25,000 - $50,000</option>
@@ -361,7 +362,7 @@
 						What technologies do you specialize in?
 					</h3>
 					<p class="text-gray-600">
-						I specialize in modern web technologies including React, Svelte, Node.js, TypeScript, and various 
+						I specialize in modern web technologies including React, Svelte, Node.js, TypeScript, Golang, Python, PHP and various 
 						databases. I choose the best technology stack based on your project's specific requirements and goals.
 					</p>
 				</div>
