@@ -58,7 +58,7 @@ export const actions: Actions = {
 			for (const block of blocks) {
 				if (block.type === 'image') {
 					try {
-						const content = JSON.parse(block.content);
+						const content = JSON.parse(block.content as string);
 						if (content.url) {
 							const r2Key = getR2KeyFromUrl(content.url);
 							if (r2Key) imagesToDelete.push(r2Key);
