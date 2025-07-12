@@ -5,6 +5,7 @@ if (!env.R2_ACCOUNT_ID) throw new Error('R2_ACCOUNT_ID is not set');
 if (!env.R2_ACCESS_KEY_ID) throw new Error('R2_ACCESS_KEY_ID is not set');
 if (!env.R2_SECRET_ACCESS_KEY) throw new Error('R2_SECRET_ACCESS_KEY is not set');
 if (!env.R2_BUCKET_NAME) throw new Error('R2_BUCKET_NAME is not set');
+if (!env.R2_PUBLIC_URL) throw new Error('R2_PUBLIC_URL is not set');
 
 const r2Client = new S3Client({
 	region: 'auto',
@@ -29,7 +30,7 @@ export async function uploadToR2(file: File, key: string): Promise<string> {
 	await r2Client.send(command);
 	
 	// Return the public URL
-	return `https://${env.R2_BUCKET_NAME}.${env.R2_ACCOUNT_ID}.r2.dev/${key}`;
+	return `${env.R2_PUBLIC_URL}/${key}`;
 }
 
 export async function deleteFromR2(key: string): Promise<void> {
