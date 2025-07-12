@@ -241,11 +241,11 @@ export const actions: Actions = {
           break;
       }
 
-      const blockId = generateBlockId();
+      const blockId = v7();
       await db.insert(table.blogBlock).values({
         id: blockId,
         postId,
-        type,
+        type: type as any,
         content: JSON.stringify(defaultContent),
         order: newOrder,
       });
@@ -300,7 +300,7 @@ export const actions: Actions = {
             alt?: string;
           } = {};
           try {
-            currentContent = JSON.parse(currentBlock.content);
+            currentContent = JSON.parse(currentBlock.content as string);
           } catch (e) {
             console.error("Error parsing current block content:", e);
           }
