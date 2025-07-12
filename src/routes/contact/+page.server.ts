@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { env } from '$env/dynamic/private';
 import type { Actions, PageServerLoad } from './$types';
+import { v7 } from 'uuid';
 
 export const load: PageServerLoad = async () => {
 	return {};
@@ -75,7 +76,7 @@ export const actions: Actions = {
 
 		try {
 			// Store the contact form submission in the database
-			const submissionId = generateId();
+			const submissionId = v7();
 			await db.insert(table.contactSubmission).values({
 				id: submissionId,
 				name: name.trim(),
@@ -94,9 +95,3 @@ export const actions: Actions = {
 		}
 	}
 };
-
-function generateId() {
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}

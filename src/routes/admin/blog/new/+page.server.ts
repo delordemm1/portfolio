@@ -4,7 +4,7 @@ import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { uploadToR2, validateImageFile } from '$lib/server/r2';
-import { v4 as uuidv4 } from 'uuid';
+import { v7 } from 'uuid';
 import type { Actions, PageServerLoad } from './$types';
 import { env } from '$env/dynamic/private';
 
@@ -43,6 +43,7 @@ export const actions: Actions = {
 		}
 
 		let featuredImageUrl: string | null = null;
+		const postId = v7();
 
 		// Handle featured image upload if provided
 		if (featuredImageFile && featuredImageFile.size > 0) {
@@ -53,7 +54,7 @@ export const actions: Actions = {
 
 			try {
 				const fileExtension = featuredImageFile.name.split('.').pop() || 'jpg';
-				const fileName = `blog/${uuidv4()}.${fileExtension}`;
+				const fileName = `blog/${postId}.${fileExtension}`;
 				featuredImageUrl = await uploadToR2(featuredImageFile, fileName);
 			} catch (error) {
 				console.error('Error uploading featured image:', error);
@@ -62,7 +63,6 @@ export const actions: Actions = {
 		}
 
 		try {
-			const postId = generatePostId();
 			
 			await db.insert(table.blogPost).values({
 				id: postId,
@@ -118,11 +118,6 @@ export const actions: Actions = {
 	}
 };
 
-function generatePostId() {
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}
 
 function requireLogin() {
 	const { locals } = getRequestEvent();

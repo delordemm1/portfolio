@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { error, fail, redirect } from "@sveltejs/kit";
+import { error, fail, isRedirect, redirect } from "@sveltejs/kit";
 import { getRequestEvent } from "$app/server";
 import { encodeBase32LowerCase } from "@oslojs/encoding";
 import { db } from "$lib/server/db";
@@ -10,7 +10,7 @@ import {
   deleteFromR2,
   getR2KeyFromUrl,
 } from "$lib/server/r2";
-import { v4 as uuidv4 } from "uuid";
+import { v7 } from "uuid";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -107,7 +107,7 @@ export const actions: Actions = {
 
         // Upload new featured image
         const fileExtension = featuredImageFile.name.split(".").pop() || "jpg";
-        const fileName = `blog/${uuidv4()}.${fileExtension}`;
+        const fileName = `blog/${v7()}.${fileExtension}`;
         featuredImageUrl = await uploadToR2(featuredImageFile, fileName);
       }
 
@@ -129,7 +129,11 @@ export const actions: Actions = {
 
       return redirect(302, "/admin/blog");
     } catch (error) {
-      console.error("Error updating blog post:", error);
+      console.error("Error updating blog post:", error, isRedirect(error));
+      if (isRedirect(error)) {
+        redirect(error?.status, error?.location);
+        return;
+      }
       return fail(500, { message: "Failed to update blog post" });
     }
   },
@@ -139,29 +143,37 @@ export const actions: Actions = {
 
     const formData = await event.request.formData();
     const postId = event.params.id;
-    const title = formData.get('title');
-    const manualSummary = formData.get('manualSummary');
+    const title = formData.get("title");
+    const manualSummary = formData.get("manualSummary");
 
-    if (!title || typeof title !== 'string' || title.trim().length === 0) {
-      return fail(400, { message: 'Title is required to generate AI summary' });
+    if (!title || typeof title !== "string" || title.trim().length === 0) {
+      return fail(400, { message: "Title is required to generate AI summary" });
     }
 
     try {
       // Call our AI summary API endpoint
-      const response = await fetch(`${event.url.origin}/api/generate-ai-summary`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          manualSummary: manualSummary && typeof manualSummary === 'string' ? manualSummary.trim() : null
-        })
-      });
+      const response = await fetch(
+        `${event.url.origin}/api/generate-ai-summary`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: title.trim(),
+            manualSummary:
+              manualSummary && typeof manualSummary === "string"
+                ? manualSummary.trim()
+                : null,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        return fail(500, { message: errorData.message || 'Failed to generate AI summary' });
+        const errorData = await response.json().catch(console.log);
+        return fail(500, {
+          message: errorData.message || "Failed to generate AI summary",
+        });
       }
 
       const { aiSummary } = await response.json();
@@ -174,11 +186,15 @@ export const actions: Actions = {
           updatedAt: new Date(),
         })
         .where(eq(table.blogPost.id, postId));
-
-      return { success: true, aiSummary, message: 'AI summary generated and saved successfully' };
+      console.log({ aiSummary });
+      return {
+        success: true,
+        aiSummary,
+        message: "AI summary generated and saved successfully",
+      };
     } catch (error) {
-      console.error('Error generating AI summary:', error);
-      return fail(500, { message: 'Failed to generate AI summary' });
+      console.error("Error generating AI summary:", error);
+      return fail(500, { message: "Failed to generate AI summary" });
     }
   },
 
@@ -280,9 +296,9 @@ export const actions: Actions = {
 
           // Parse current content to get existing URL
           let currentContent: {
-			url?: string;
-			alt?: string;
-		  } = {};
+            url?: string;
+            alt?: string;
+          } = {};
           try {
             currentContent = JSON.parse(currentBlock.content);
           } catch (e) {
@@ -308,7 +324,7 @@ export const actions: Actions = {
 
             // Upload new image
             const fileExtension = imageFile.name.split(".").pop() || "jpg";
-            const fileName = `blog/blocks/${uuidv4()}.${fileExtension}`;
+            const fileName = `blog/blocks/${v7()}.${fileExtension}`;
             imageUrl = await uploadToR2(imageFile, fileName);
           }
 
@@ -383,7 +399,7 @@ export const actions: Actions = {
       // Delete image from R2 if it's an image block
       if (block.type === "image") {
         try {
-          const content = JSON.parse(block.content);
+          const content = JSON.parse(block.content as any);
           if (content.url) {
             const r2Key = getR2KeyFromUrl(content.url);
             if (r2Key) {
@@ -437,12 +453,6 @@ export const actions: Actions = {
     }
   },
 };
-
-function generateBlockId() {
-  const bytes = crypto.getRandomValues(new Uint8Array(15));
-  const id = encodeBase32LowerCase(bytes);
-  return id;
-}
 
 function requireLogin() {
   const { locals } = getRequestEvent();

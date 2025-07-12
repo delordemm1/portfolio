@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
+  import { enhance, applyAction } from "$app/forms";
   import type { PageServerData, ActionData } from "./$types";
 
   let { data, form }: { data: PageServerData; form: ActionData } = $props();
@@ -7,6 +7,7 @@
   let removeFeaturedImage = $state(false);
   let editingBlock = $state<string | null>(null);
   let draggedBlock = $state<string | null>(null);
+  let isGeneratingAi = $state(false);
 
   function parseBlockContent(content: string) {
     try {
@@ -71,6 +72,20 @@
     });
 
     draggedBlock = null;
+  }
+  async function generateAiSummary() {
+    isGeneratingAi = true;
+
+    const formData = new FormData();
+    formData.append("title", data.post.title);
+    formData.append("manualSummary", data.post.manualSummary || "");
+
+    const response = await fetch("?/generateAiSummary", {
+      method: "POST",
+      body: formData,
+    });
+    applyAction(await response.json());
+    isGeneratingAi = false;
   }
 </script>
 
@@ -294,11 +309,44 @@
               <!-- AI Summary Section -->
               <div class="sm:col-span-2">
                 <div class="flex items-center justify-between mb-2">
-                  <label class="block text-sm font-medium text-gray-700">
+                  <label class="block text-sm font-medium text-gray-700" for="">
                     AI-Generated Summary
                   </label>
-                  <form 
-                    method="post" 
+                  <button
+                    type="button"
+                    onclick={generateAiSummary}
+                    disabled={isGeneratingAi}
+                    class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {#if isGeneratingAi}
+                      <svg
+                        class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-700"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Generating...
+                    {:else}
+                      {data.post.aiSummary
+                        ? "Regenerate AI Summary"
+                        : "Generate AI Summary"}
+                    {/if}
+                  </button>
+                  <!-- <form
+                    method="post"
                     action="?/generateAiSummary"
                     use:enhance={() => {
                       isGeneratingAi = true;
@@ -309,31 +357,57 @@
                     }}
                   >
                     <input type="hidden" name="title" value={data.post.title} />
-                    <input type="hidden" name="manualSummary" value={data.post.manualSummary || ''} />
+                    <input
+                      type="hidden"
+                      name="manualSummary"
+                      value={data.post.manualSummary || ""}
+                    />
                     <button
                       type="submit"
                       disabled={isGeneratingAi}
                       class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {#if isGeneratingAi}
-                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-700" fill="none" viewBox="0 0 24 24">
-                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg
+                          class="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-700"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         Generating...
                       {:else}
-                        {data.post.aiSummary ? 'Regenerate AI Summary' : 'Generate AI Summary'}
+                        {data.post.aiSummary
+                          ? "Regenerate AI Summary"
+                          : "Generate AI Summary"}
                       {/if}
                     </button>
-                  </form>
+                  </form> -->
                 </div>
                 {#if data.post.aiSummary || form?.aiSummary}
-                  <div class="mt-1 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                    <p class="text-sm text-blue-800">{form?.aiSummary || data.post.aiSummary}</p>
+                  <div
+                    class="mt-1 p-3 bg-blue-50 border border-blue-200 rounded-md"
+                  >
+                    <p class="text-sm text-blue-800">
+                      {form?.aiSummary || data.post.aiSummary}
+                    </p>
                   </div>
                 {:else}
                   <p class="text-xs text-gray-500">
-                    Click "Generate AI Summary" to create an AI-powered summary for this blog post.
+                    Click "Generate AI Summary" to create an AI-powered summary
+                    for this blog post.
                   </p>
                 {/if}
               </div>
@@ -407,7 +481,7 @@
           {#if data.blocks.length > 0}
             <div class="space-y-4">
               {#each data.blocks as block, index}
-                {@const content = parseBlockContent(block.content)}
+                {@const content = parseBlockContent(block.content as any)}
                 <!-- svelte-ignore a11y_no_static_element_interactions -->
                 <div
                   class="border border-gray-200 rounded-lg p-4 cursor-move hover:border-gray-300 transition-colors"

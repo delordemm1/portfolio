@@ -30,7 +30,7 @@
 		return icons[platform.toLowerCase()] || '';
 	}
 
-	$: groupedSkills = groupSkillsByCategory(data.skills);
+let groupedSkills = $derived.by(()=>groupSkillsByCategory(data.skills));
 </script>
 
 <svelte:head>

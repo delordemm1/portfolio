@@ -4,7 +4,7 @@ import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { uploadToR2, validateImageFile } from '$lib/server/r2';
-import { v4 as uuidv4 } from 'uuid';
+import { v7 } from 'uuid';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
@@ -35,6 +35,7 @@ export const actions: Actions = {
 		}
 
 		let imageUrl: string | null = null;
+		const projectId = v7();
 
 		// Handle image upload if provided
 		if (imageFile && imageFile.size > 0) {
@@ -45,7 +46,7 @@ export const actions: Actions = {
 
 			try {
 				const fileExtension = imageFile.name.split('.').pop() || 'jpg';
-				const fileName = `projects/${uuidv4()}.${fileExtension}`;
+				const fileName = `projects/${projectId}.${fileExtension}`;
 				imageUrl = await uploadToR2(imageFile, fileName);
 			} catch (error) {
 				console.error('Error uploading image:', error);
@@ -54,7 +55,6 @@ export const actions: Actions = {
 		}
 
 		try {
-			const projectId = generateProjectId();
 			
 			await db.insert(table.project).values({
 				id: projectId,
@@ -67,7 +67,7 @@ export const actions: Actions = {
 				status: status as 'draft' | 'published'
 			});
 
-			return redirect(302, '/admin/projects');
+			redirect(302, '/admin/projects');
 		} catch (error) {
 			console.error('Error creating project:', error);
 			return fail(500, { message: 'Failed to create project' });
@@ -75,17 +75,11 @@ export const actions: Actions = {
 	}
 };
 
-function generateProjectId() {
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}
-
 function requireLogin() {
 	const { locals } = getRequestEvent();
 
 	if (!locals.user) {
-		return redirect(302, '/admin/login');
+		redirect(302, '/admin/login');
 	}
 
 	return locals.user;

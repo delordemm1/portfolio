@@ -4,7 +4,9 @@ import { getRequestEvent } from '$app/server';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
+import type { SocialPlatform, SkillLevel, SkillCategory } from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
+import { v7 } from 'uuid';
 
 export const load: PageServerLoad = async () => {
 	const user = requireLogin();
@@ -103,7 +105,7 @@ export const actions: Actions = {
 			} else {
 				// Create new resume
 				await db.insert(table.resume).values({
-					id: generateId(),
+					id: v7(),
 					...resumeData
 				});
 			}
@@ -150,7 +152,7 @@ export const actions: Actions = {
 			const maxOrder = experiences.length > 0 ? Math.max(...experiences.map(e => e.order)) : -1;
 
 			await db.insert(table.experience).values({
-				id: generateId(),
+				id: v7(),
 				resumeId,
 				company: company.trim(),
 				position: position.trim(),
@@ -271,7 +273,7 @@ export const actions: Actions = {
 			const maxOrder = education.length > 0 ? Math.max(...education.map(e => e.order)) : -1;
 
 			await db.insert(table.education).values({
-				id: generateId(),
+				id: v7(),
 				resumeId,
 				institution: institution.trim(),
 				degree: degree.trim(),
@@ -387,11 +389,11 @@ export const actions: Actions = {
 			const maxOrder = skills.length > 0 ? Math.max(...skills.map(s => s.order)) : -1;
 
 			await db.insert(table.skill).values({
-				id: generateId(),
+				id: v7(),
 				resumeId,
 				name: name.trim(),
-				category: category.trim(),
-				level: level && typeof level === 'string' ? level.trim() || null : null,
+				category: category.trim() as SkillCategory,
+				level: (level && typeof level === 'string' ? level.trim() || null : null) as SkillLevel,
 				order: maxOrder + 1
 			});
 
@@ -428,8 +430,8 @@ export const actions: Actions = {
 				.update(table.skill)
 				.set({
 					name: name.trim(),
-					category: category.trim(),
-					level: level && typeof level === 'string' ? level.trim() || null : null
+					category: category.trim() as SkillCategory,
+					level: (level && typeof level === 'string' ? level.trim() || null : null) as SkillLevel
 				})
 				.where(eq(table.skill.id, id));
 
@@ -493,11 +495,11 @@ export const actions: Actions = {
 			const maxOrder = socialLinks.length > 0 ? Math.max(...socialLinks.map(s => s.order)) : -1;
 
 			await db.insert(table.socialLink).values({
-				id: generateId(),
+				id: v7(),
 				resumeId,
-				platform: platform.trim(),
+				platform: platform.trim() as  SocialPlatform,
 				url: url.trim(),
-				order: maxOrder + 1
+				order: maxOrder + 1,
 			});
 
 			return { success: true, message: 'Social link added successfully' };
@@ -538,7 +540,7 @@ export const actions: Actions = {
 			await db
 				.update(table.socialLink)
 				.set({
-					platform: platform.trim(),
+					platform: platform.trim() as SocialPlatform,
 					url: url.trim()
 				})
 				.where(eq(table.socialLink.id, id));
@@ -582,7 +584,7 @@ async function getOrCreateResumeId(): Promise<string> {
 	}
 
 	// Create a basic resume entry
-	const resumeId = generateId();
+	const resumeId = v7();
 	await db.insert(table.resume).values({
 		id: resumeId,
 		fullName: 'Your Name',
@@ -593,11 +595,6 @@ async function getOrCreateResumeId(): Promise<string> {
 	return resumeId;
 }
 
-function generateId() {
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}
 
 function requireLogin() {
 	const { locals } = getRequestEvent();

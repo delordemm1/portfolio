@@ -1,17 +1,29 @@
 import { hash, verify } from '@node-rs/argon2';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
+import { v7 } from 'uuid';
 
 export const load: PageServerLoad = async (event) => {
+	// 1. First, keep the check for an already logged-in user.
 	if (event.locals.user) {
-		return redirect(302, '/admin/dashboard');
+		redirect(302, '/admin/dashboard');
 	}
-	return {};
+
+    // 2. Query the database for the count of users.
+    // We use count() for efficiency as we don't need the actual user data.
+    const userCountResult = await db.select({ value: count() }).from(table.user);
+    const numUsers = userCountResult[0].value;
+
+    // 3. Determine if registration should be allowed.
+    const allowRegistration = numUsers === 0;
+
+    // 4. Return this value so it's available as `data.allowRegistration` in the Svelte component.
+	return { allowRegistration };
 };
 
 export const actions: Actions = {
@@ -65,7 +77,7 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid password' });
 		}
 
-		const userId = generateUserId();
+		const userId = v7();
 		const passwordHash = await hash(password, {
 			// recommended minimum parameters
 			memoryCost: 19456,
@@ -86,13 +98,6 @@ export const actions: Actions = {
 		return redirect(302, '/admin/dashboard');
 	},
 };
-
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}
 
 function validateUsername(username: unknown): username is string {
 	return (

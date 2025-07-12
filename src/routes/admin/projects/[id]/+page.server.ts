@@ -4,7 +4,6 @@ import { getRequestEvent } from '$app/server';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { uploadToR2, validateImageFile, deleteFromR2, getR2KeyFromUrl } from '$lib/server/r2';
-import { v4 as uuidv4 } from 'uuid';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -85,7 +84,7 @@ export const actions: Actions = {
 
 				// Upload new image
 				const fileExtension = imageFile.name.split('.').pop() || 'jpg';
-				const fileName = `projects/${uuidv4()}.${fileExtension}`;
+				const fileName = `projects/${projectId}.${fileExtension}`;
 				imageUrl = await uploadToR2(imageFile, fileName);
 			}
 
