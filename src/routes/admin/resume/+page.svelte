@@ -247,7 +247,7 @@
 								<div>
 									<label class="block text-sm font-medium text-gray-700">Start Date *</label>
 									<input
-										type="month"
+										type="date"
 										name="startDate"
 										required
 										class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -256,7 +256,7 @@
 								<div>
 									<label class="block text-sm font-medium text-gray-700">End Date</label>
 									<input
-										type="month"
+										type="date"
 										name="endDate"
 										class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 									/>
@@ -320,7 +320,7 @@
 											<div>
 												<label class="block text-sm font-medium text-gray-700">Start Date *</label>
 												<input
-													type="month"
+													type="date"
 													name="startDate"
 													required
 													value={formatDate(experience.startDate)}
@@ -330,7 +330,7 @@
 											<div>
 												<label class="block text-sm font-medium text-gray-700">End Date</label>
 												<input
-													type="month"
+													type="date"
 													name="endDate"
 													value={formatDate(experience.endDate)}
 													class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -470,7 +470,7 @@
 								<div>
 									<label class="block text-sm font-medium text-gray-700">Start Date *</label>
 									<input
-										type="month"
+										type="date"
 										name="startDate"
 										required
 										class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -479,7 +479,7 @@
 								<div>
 									<label class="block text-sm font-medium text-gray-700">End Date</label>
 									<input
-										type="month"
+										type="date"
 										name="endDate"
 										class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
 									/>
@@ -552,7 +552,7 @@
 											<div>
 												<label class="block text-sm font-medium text-gray-700">Start Date *</label>
 												<input
-													type="month"
+													type="date"
 													name="startDate"
 													required
 													value={formatDate(edu.startDate)}
@@ -562,7 +562,7 @@
 											<div>
 												<label class="block text-sm font-medium text-gray-700">End Date</label>
 												<input
-													type="month"
+													type="date"
 													name="endDate"
 													value={formatDate(edu.endDate)}
 													class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -842,6 +842,7 @@
 										<option value="instagram">Instagram</option>
 										<option value="facebook">Facebook</option>
 										<option value="youtube">YouTube</option>
+										<option value="portfolio">Portfolio</option>
 										<option value="website">Personal Website</option>
 									</select>
 								</div>
@@ -887,6 +888,7 @@
 													<option value="instagram" selected={link.platform === 'instagram'}>Instagram</option>
 													<option value="facebook" selected={link.platform === 'facebook'}>Facebook</option>
 													<option value="youtube" selected={link.platform === 'youtube'}>YouTube</option>
+													<option value="website" selected={link.platform === 'portfolio'}>Portfolio</option>
 													<option value="website" selected={link.platform === 'website'}>Personal Website</option>
 												</select>
 											</div>

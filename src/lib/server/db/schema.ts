@@ -11,8 +11,8 @@ import {
 } from 'drizzle-orm/pg-core';
 // PLATFORM VALUES
 
-const socialPlatforms = ['linkedin', 'github', 'twitter', 'portfolio'] as const;
-const skillCategories = ['technical', 'soft', 'language'] as const;
+const socialPlatforms = ['linkedin', 'github', 'twitter', 'portfolio', 'instagram', 'facebook', 'youtube', 'website'] as const;
+const skillCategories = ['technical', 'soft', 'language', 'frameworks', 'tools', 'other'] as const;
 const skillLevels = ['beginner', 'intermediate', 'advanced', 'expert'] as const;
 
 // --- ENUMS ---
