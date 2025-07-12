@@ -129,11 +129,10 @@ export const actions: Actions = {
 
       return redirect(302, "/admin/blog");
     } catch (error) {
-      console.error("Error updating blog post:", error, isRedirect(error));
       if (isRedirect(error)) {
         redirect(error?.status, error?.location);
-        return;
       }
+      console.error("Error updating blog post:", error, isRedirect(error));
       return fail(500, { message: "Failed to update blog post" });
     }
   },
