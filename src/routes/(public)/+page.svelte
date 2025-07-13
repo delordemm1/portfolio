@@ -40,6 +40,7 @@
     property="og:description"
     content="Welcome to my digital portfolio. I'm a passionate full-stack developer creating innovative web applications and sharing insights through my blog."
   />
+  <meta property="og:image" content="/images/devEmm.png" />
   <meta property="og:url" content="/" />
 
   <!-- Twitter -->
