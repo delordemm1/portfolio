@@ -446,16 +446,10 @@
 
               <!-- Cloudflare Turnstile -->
               <div class="flex items-center justify-center my-3">
-                <!-- <div
-                  class="cf-turnstile"
-                  data-sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY ||
-                    "YOUR_SITE_KEY"}
-                  data-theme="light"
-                ></div> -->
                 {#if robotButtonClicked}
                   <Turnstile
                     theme="light"
-                    siteKey="0x4AAAAAAAfqNbMYbOz7xuz2"
+                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
                     responseFieldName="cfTurnstileResponse"
                     size="flexible"
                     appearance="always"
@@ -463,11 +457,6 @@
                     retry="never"
                     bind:reset
                     on:callback={(e) => {
-                      console.log(e.detail);
-                      // formData.update((fd) => ({
-                      //   ...fd,
-                      //   cfTurnstileResponse: e.detail.token,
-                      // }));
                       humanVerified = true;
                     }}
                     on:error={(e) => {
