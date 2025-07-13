@@ -460,6 +460,7 @@
                     size="flexible"
                     appearance="always"
                     execution="render"
+                    retry="never"
                     bind:reset
                     on:callback={(e) => {
                       console.log(e.detail);
@@ -472,7 +473,8 @@
                     on:error={(e) => {
                       console.log(e.detail);
                       humanVerified = false;
-                      reset?.();
+                      robotButtonClicked = false;
+                      // reset?.();
                       // form.errors.update((errors) => ({
                       //   ...errors,
                       //   cfTurnstileResponse: [
