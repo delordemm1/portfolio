@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-  <title>Portfolio - Full Stack Developer & Creative Technologist</title>
+  <title>DevEmm - Full Stack Developer & Creative Technologist</title>
   <meta
     name="description"
     content="Welcome to my digital portfolio. I'm a passionate full-stack developer creating innovative web applications and sharing insights through my blog. Explore my projects and thoughts on modern web development."
@@ -34,7 +34,7 @@
   <meta property="og:type" content="website" />
   <meta
     property="og:title"
-    content="Portfolio - Full Stack Developer & Creative Technologist"
+    content="DevEmm - Full Stack Developer & Creative Technologist"
   />
   <meta
     property="og:description"
@@ -46,7 +46,7 @@
   <meta property="twitter:card" content="summary_large_image" />
   <meta
     property="twitter:title"
-    content="Portfolio - Full Stack Developer & Creative Technologist"
+    content="DevEmm - Full Stack Developer & Creative Technologist"
   />
   <meta
     property="twitter:description"
@@ -58,7 +58,7 @@
 		{
 			"@context": "https://schema.org",
 			"@type": "Person",
-			"name": "Portfolio Author",
+			"name": "Emmanuel Arua",
 			"jobTitle": "Full Stack Developer",
 			"description": "Passionate full-stack developer creating innovative web applications",
 			"url": "/",
